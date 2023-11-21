@@ -1,14 +1,18 @@
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Provider/AuthProvider";
 import Swal from "sweetalert2";
+import useAxiosPublic from "../../Hooks/useAxiosPublic";
+import { FaGoogle } from "react-icons/fa";
+import SocialLogin from "../../Components/SocialLogin/SocialLogin";
 
 
 
 const SignUp = () => {
-
+    const axiosPublic = useAxiosPublic();
     const {createUser} = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const {
         register,
@@ -22,11 +26,30 @@ const SignUp = () => {
         createUser(data.email, data.password)
         .then(result => {
             console.log(result.user);
-            Swal.fire({
+
+            const userInfo = {
+              name : data.name,
+              email : data.email,
+            }
+          axiosPublic.post('/users', userInfo)
+          .then(res => {
+            if(res.data.insertedId)
+            {
+              console.log('user added to  the database');
+              Swal.fire({
                 title: "Registration Sussfully Add",
                 text: "You clicked the button!",
                 icon: "success"
               });
+              navigate('/');
+            }
+          })
+
+
+
+            
+            
+              
         })
         .catch(error => {
             console.log(error.message);
@@ -83,7 +106,9 @@ const SignUp = () => {
         </div>
       </form>
       <p className="text-center my-6" >Are you Alrady Account <Link className="text-blue-600" to='/login'> Login </Link> </p>
+      <SocialLogin></SocialLogin>
     </div>
+    
   </div>
 </div>
     );
